@@ -5,13 +5,13 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //My variables
-const urlDatabase = {
+let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
 function generateRandomString() {
-  let result;
+  let result = '';
   const charcters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 6; i++) {
     result += charcters.charAt(Math.floor(Math.random() * charcters.length))
@@ -52,7 +52,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
-  res.send("Ok");        // Respond with 'Ok' (will replace later)
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`)
 });
 
 app.listen(PORT, () => {
