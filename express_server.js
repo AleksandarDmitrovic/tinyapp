@@ -1,7 +1,12 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+
 const app = express();
 const PORT = 8080; // default port 8080
-const bodyParser = require("body-parser");
+
+app.set("view engine", "ejs");
+
+//Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //My variables
@@ -18,10 +23,6 @@ function generateRandomString() {
   }
   return result;
 }
-
-app.set("view engine", "ejs");
-
-
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -68,15 +69,17 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`)
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL]
-  res.redirect(`/urls/`)
-});
-
+//Edit POST
 app.post("/urls/:id", (req, res) => {
   let longURL = req.body.longURL;
   let shortURL = req.params.id;
   urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/`)
+});
+
+//Delete POST
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL]
   res.redirect(`/urls/`)
 });
 
