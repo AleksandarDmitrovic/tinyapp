@@ -21,7 +21,7 @@ function generateRandomString() {
   let result = '';
   const charcters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 6; i++) {
-    result += charcters.charAt(Math.floor(Math.random() * charcters.length))
+    result += charcters.charAt(Math.floor(Math.random() * charcters.length));
   }
   return result;
 }
@@ -53,9 +53,9 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
+  const longURL = urlDatabase[req.params.shortURL];
   if (!longURL) {
-    console.log('error')
+    console.log('error');
     res.redirect('/');
   } else {
     res.redirect(longURL);
@@ -63,13 +63,19 @@ app.get("/u/:shortURL", (req, res) => {
   // console.log('longURL :', longURL);
 });
 
+//Render registration form
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+
 //Edit POST
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`)
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //Edit POST
@@ -77,26 +83,26 @@ app.post("/urls/:id", (req, res) => {
   let longURL = req.body.longURL;
   let shortURL = req.params.id;
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/`)
+  res.redirect(`/urls/`);
 });
 
 // Edit POST
 app.post("/login", (req, res) => {
   let username = req.body.username;
-  res.cookie('username', username)
-  res.redirect('/urls/')
+  res.cookie('username', username);
+  res.redirect('/urls/');
 });
 
 //Edit POST
 app.post("/logout", (req, res) => {
-  res.clearCookie('username')
-  res.redirect('/urls/')
+  res.clearCookie('username');
+  res.redirect('/urls/');
 });
 
 //Delete POST
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL]
-  res.redirect(`/urls/`)
+  delete urlDatabase[req.params.shortURL];
+  res.redirect(`/urls/`);
 });
 
 app.listen(PORT, () => {
