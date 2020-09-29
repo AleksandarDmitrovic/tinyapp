@@ -26,6 +26,7 @@ function generateRandomString() {
   return result;
 }
 
+//Root Page
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -38,20 +39,25 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+//Renders All My URLs Page
 app.get("/urls", (req, res) => {
   const templateVars = { username: req.cookies['username'], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+//Renders Create New TinyURL Page
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { username: req.cookies['username'] }
+  res.render("urls_new", templateVars);
 });
 
+//Renders Edit Page for each Short URL
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
+//Redirects to Long URL Link
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   if (!longURL) {
@@ -63,13 +69,13 @@ app.get("/u/:shortURL", (req, res) => {
   // console.log('longURL :', longURL);
 });
 
-//Render registration form
+//Renders Registration Form
 app.get("/register", (req, res) => {
   res.render("register");
 });
 
 
-//Edit POST
+//Edit Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
   let shortURL = generateRandomString();
@@ -78,7 +84,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-//Edit POST
+//Edit Long URLs of Corresponding Short URLs EJS: urls_show
 app.post("/urls/:id", (req, res) => {
   let longURL = req.body.longURL;
   let shortURL = req.params.id;
@@ -86,20 +92,20 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(`/urls/`);
 });
 
-// Edit POST
+// Edit Creates Login Cookie with Username
 app.post("/login", (req, res) => {
   let username = req.body.username;
   res.cookie('username', username);
   res.redirect('/urls/');
 });
 
-//Edit POST
+//Edit Logout and Cookie clearing
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls/');
 });
 
-//Delete POST
+//Deletes URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect(`/urls/`);
