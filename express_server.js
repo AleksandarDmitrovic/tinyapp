@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -8,6 +9,7 @@ app.set("view engine", "ejs");
 
 //Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 //My variables
 let urlDatabase = {
@@ -61,6 +63,7 @@ app.get("/u/:shortURL", (req, res) => {
   // console.log('longURL :', longURL);
 });
 
+//Edit POST
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
   let shortURL = generateRandomString();
@@ -75,6 +78,13 @@ app.post("/urls/:id", (req, res) => {
   let shortURL = req.params.id;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/`)
+});
+
+// Edit POST
+app.post("/login", (req, res) => {
+  let username = req.body.username;
+  res.cookie('username', username)
+  res.redirect('/urls/')
 });
 
 //Delete POST
