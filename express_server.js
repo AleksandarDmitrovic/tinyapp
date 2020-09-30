@@ -26,6 +26,19 @@ function generateRandomString() {
   return result;
 }
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
 //Root Page
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -75,37 +88,52 @@ app.get("/register", (req, res) => {
 });
 
 
-//Edit Generates Random Short URL and Adds Key:Value to URL Database
+//Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
-  let shortURL = generateRandomString();
-  let longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
-//Edit Long URLs of Corresponding Short URLs EJS: urls_show
+//Edit- Transforms Long URLs of Corresponding Short URLs EJS: urls_show
 app.post("/urls/:id", (req, res) => {
-  let longURL = req.body.longURL;
-  let shortURL = req.params.id;
+  const longURL = req.body.longURL;
+  const shortURL = req.params.id;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/`);
 });
 
-// Edit Creates Login Cookie with Username
+//Add- Creates Login Cookie with Username
 app.post("/login", (req, res) => {
-  let username = req.body.username;
+  const username = req.body.username;
   res.cookie('username', username);
   res.redirect('/urls/');
 });
 
-//Edit Logout and Cookie clearing
+//Edit- Logout and Cookie clearing
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls/');
 });
 
-//Deletes URLs
+//Add- Registration Handler for New User Creation
+app.post('/register', (req, res) => {
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  const newUser = {
+    id,
+    email,
+    password
+  };
+  users[id] = newUser;
+  res.cookie('user_id', id);
+  res.redirect('/urls/');
+});
+
+//Delete- Removes URLs from database 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect(`/urls/`);
