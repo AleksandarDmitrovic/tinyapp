@@ -54,19 +54,19 @@ app.get("/urls.json", (req, res) => {
 
 //Renders All My URLs Page
 app.get("/urls", (req, res) => {
-  const templateVars = { username: req.cookies['username'], urls: urlDatabase };
+  const templateVars = { username: users[req.cookies['user_id']], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
 //Renders Create New TinyURL Page
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies['username'] }
+  const templateVars = { username: users[req.cookies['user_id']] }
   res.render("urls_new", templateVars);
 });
 
 //Renders Edit Page for each Short URL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = { username: users[req.cookies['user_id']], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
@@ -129,6 +129,7 @@ app.post('/register', (req, res) => {
     password
   };
   users[id] = newUser;
+  console.log('users :', users);
   res.cookie('user_id', id);
   res.redirect('/urls/');
 });
