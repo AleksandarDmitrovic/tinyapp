@@ -14,8 +14,8 @@ app.use(cookieParser());
 
 //---Databases & My Global Variables---//
 let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
 };
 
 function generateRandomString() {
@@ -87,7 +87,8 @@ app.get("/urls/new", (req, res) => {
 
 //Renders Edit Page for each Short URL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { user_id: users[req.cookies['user_id']], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  longURLValue = urlDatabase[req.params.shortURL]['longURL'];
+  const templateVars = { user_id: users[req.cookies['user_id']], shortURL: req.params.shortURL, longURL: longURLValue };
   res.render("urls_show", templateVars);
 });
 
