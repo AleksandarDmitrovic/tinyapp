@@ -140,6 +140,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls/`);
 });
 
+//Catchall to send user to error page if url isn't valid
+app.get('*', (req, res) => {
+  res.status(404).send('page not found');
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
