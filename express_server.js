@@ -30,7 +30,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "123"
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -39,12 +39,12 @@ const users = {
   }
 }
 
-//Helper Function to Search users Database
+//Helper Function to Search users Database Returns User Object if Email Found
 const emailLookup = (email) => {
 
   for (const id in users) {
     if (users[id].email === email) {
-      return true;
+      return users[id];
     }
   }
 
@@ -122,10 +122,23 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(`/urls/`);
 });
 
-//Add- Creates Login Cookie with Username
+//Add- Creates Login Cookie with User ID
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
+  const { email, password } = req.body; // Short hand for creating email password constants
+  let foundUser = null;
+  if (emailLookup(email) !== false) {
+    foundUser = emailLookup(email)
+  }
+  console.log('foundUser :', foundUser);
+  if (foundUser === null) {
+    return res.status(404).send("No user with that email found")
+  }
+  if (foundUser.password !== password) {
+    return res.status(404).send(`Incorrect Password For ${email}`)
+  }
+
+  res.cookie('user_id', foundUser.id);
+
   res.redirect('/urls/');
 });
 
@@ -144,7 +157,7 @@ app.post('/register', (req, res) => {
     return res.status(404).send("Invalid email or password");
   }
 
-  if (emailLookup(email)) {
+  if (emailLookup(email) !== false) {
     return res.status(404).send("User Email Already Exists");
   }
   const newUser = {
