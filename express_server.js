@@ -73,7 +73,7 @@ const urlsForUser = (id) => {
 //VIEW ROUTES
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect('/urls');
 });
 
 app.get("/hello", (req, res) => {
