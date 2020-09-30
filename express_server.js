@@ -32,12 +32,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "123"
+    password: "$2b$10$dHaDELTlnfrlMplszy7P1eZibQ4IHD1Dss3eI.dneqPX1SeEKhSu2" //password 123
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "$2b$10$cowaKSEEXvCh8Hq7M0piWuYMYi2Yz29bBY8NLlPGRwrg7x2s6b.J6" //dishwasher-funk
   }
 };
 
@@ -168,7 +168,7 @@ app.post("/login", (req, res) => {
   if (foundUser === null) {
     return res.status(404).send("No user with that email found");
   }
-  if (foundUser.password !== password) {
+  if (!bcrypt.compareSync(password, foundUser.password)) {
     return res.status(404).send(`Incorrect Password For ${email}`);
   }
 
@@ -189,6 +189,7 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
+  console.log('hashedPassword :', hashedPassword);
   if (email === '' || password === '') {
     return res.status(404).send("Invalid email or password");
   }
