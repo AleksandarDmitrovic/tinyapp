@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
 //---Server Setup---//
@@ -11,7 +11,10 @@ app.set("view engine", "ejs");
 
 //---Middleware---//
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'TinyApp',
+  keys: ['super-long-secret-key-how-about-that']
+}));
 
 //---Databases & My Global Variables---//
 let urlDatabase = {
@@ -87,16 +90,16 @@ app.get("/urls.json", (req, res) => {
 
 //Renders All My URLs Page
 app.get("/urls", (req, res) => {
-  const id = req.cookies['user_id'];
+  const id = req.session['user_id'];
   const usersURLs = urlsForUser(id);
-  const templateVars = { user_id: users[req.cookies['user_id']], urls: usersURLs };
+  const templateVars = { user_id: users[req.session['user_id']], urls: usersURLs };
   res.render("urls_index", templateVars);
 });
 
 //Renders Create New TinyURL Page
 app.get("/urls/new", (req, res) => {
-  const templateVars = { user_id: users[req.cookies['user_id']] };
-  if (req.cookies['user_id']) {
+  const templateVars = { user_id: users[req.session['user_id']] };
+  if (req.session['user_id']) {
     res.render("urls_new", templateVars);
   } else {
     res.redirect('/login');
@@ -106,7 +109,7 @@ app.get("/urls/new", (req, res) => {
 //Renders Edit Page for each Short URL
 app.get("/urls/:shortURL", (req, res) => {
   const longURLValue = urlDatabase[req.params.shortURL]['longURL'];
-  const templateVars = { user_id: users[req.cookies['user_id']], shortURL: req.params.shortURL, longURL: longURLValue };
+  const templateVars = { user_id: users[req.session['user_id']], shortURL: req.params.shortURL, longURL: longURLValue };
   res.render("urls_show", templateVars);
 });
 
@@ -124,13 +127,13 @@ app.get("/u/:shortURL", (req, res) => {
 
 //Renders Registration Form
 app.get("/register", (req, res) => {
-  const templateVars = { user_id: users[req.cookies['user_id']] };
+  const templateVars = { user_id: users[req.session['user_id']] };
   res.render("register", templateVars);
 });
 
 //Renders Login Page
 app.get("/login", (req, res) => {
-  const templateVars = { user_id: users[req.cookies['user_id']] };
+  const templateVars = { user_id: users[req.session['user_id']] };
   res.render("login", templateVars);
 });
 
@@ -141,7 +144,7 @@ app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  const id = req.cookies['user_id'];
+  const id = req.session['user_id'];
   urlDatabase[shortURL] = { longURL, userID: id };
   res.redirect(`/urls/${shortURL}`);
 });
@@ -150,7 +153,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = req.params.id;
-  const usersURLs = urlsForUser(req.cookies['user_id']);
+  const usersURLs = urlsForUser(req.session['user_id']);
   if (!(shortURL in usersURLs)) {
     return res.status(404).send("Authentication Required");
   }
@@ -172,14 +175,14 @@ app.post("/login", (req, res) => {
     return res.status(404).send(`Incorrect Password For ${email}`);
   }
 
-  res.cookie('user_id', foundUser.id);
+  req.session.user_id = foundUser.id;
 
   res.redirect('/urls/');
 });
 
 //Edit- Logout and Cookie Clearing
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls/');
 });
 
@@ -205,13 +208,13 @@ app.post('/register', (req, res) => {
   users[id] = newUser;
   console.log('users :', users);
 
-  res.cookie('user_id', id);
+  req.session.user_id = id;
   res.redirect('/urls/');
 });
 
 //Delete- Removes URLs from database
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (!req.cookies['user_id']) {
+  if (!req.session['user_id']) {
     return res.status(404).send("Authentication Required");
   }
   delete urlDatabase[req.params.shortURL];
