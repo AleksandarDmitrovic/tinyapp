@@ -149,7 +149,8 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = req.params.id;
-  if (!req.cookies['user_id']) {
+  const usersURLs = urlsForUser(req.cookies['user_id']);
+  if (!(shortURL in usersURLs)) {
     return res.status(404).send("Authentication Required");
   }
   urlDatabase[shortURL].longURL = longURL;
