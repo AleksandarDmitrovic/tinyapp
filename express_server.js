@@ -46,11 +46,11 @@ const users = {
 
 //Helper Functions
 //Searchs users Database Returns User Object if Email Found
-const emailLookup = (email) => {
+const emailLookup = (email, database) => {
 
-  for (const id in users) {
-    if (users[id].email === email) {
-      return users[id];
+  for (const id in database) {
+    if (database[id].email === email) {
+      return database[id];
     }
   }
 
@@ -165,8 +165,8 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body; // Short hand for creating email password constants
   let foundUser = null;
-  if (emailLookup(email) !== false) {
-    foundUser = emailLookup(email);
+  if (emailLookup(email, users) !== false) {
+    foundUser = emailLookup(email, users);
   }
   if (foundUser === null) {
     return res.status(404).send("No user with that email found");
@@ -197,7 +197,7 @@ app.post('/register', (req, res) => {
     return res.status(404).send("Invalid email or password");
   }
 
-  if (emailLookup(email) !== false) {
+  if (emailLookup(email, users) !== false) {
     return res.status(404).send("User Email Already Exists");
   }
   const newUser = {
