@@ -40,7 +40,8 @@ const users = {
   }
 }
 
-//Helper Function to Search users Database Returns User Object if Email Found
+//Helper Functions
+//Searchs users Database Returns User Object if Email Found
 const emailLookup = (email) => {
 
   for (const id in users) {
@@ -50,6 +51,20 @@ const emailLookup = (email) => {
   }
 
   return false;
+
+};
+
+//Returns URLs associated with a specific user ID
+const urlsForUser = (id) => {
+  result = {};
+
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      result[url] = urlDatabase[url]
+    }
+  }
+
+  return result;
 
 };
 
@@ -71,7 +86,9 @@ app.get("/urls.json", (req, res) => {
 
 //Renders All My URLs Page
 app.get("/urls", (req, res) => {
-  const templateVars = { user_id: users[req.cookies['user_id']], urls: urlDatabase };
+  const id = req.cookies['user_id']
+  const usersURLs = urlsForUser(id);
+  const templateVars = { user_id: users[req.cookies['user_id']], urls: usersURLs };
   res.render("urls_index", templateVars);
 });
 
