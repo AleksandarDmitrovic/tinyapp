@@ -67,19 +67,19 @@ app.get("/urls.json", (req, res) => {
 
 //Renders All My URLs Page
 app.get("/urls", (req, res) => {
-  const templateVars = { username: users[req.cookies['user_id']], urls: urlDatabase };
+  const templateVars = { user_id: users[req.cookies['user_id']], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
 //Renders Create New TinyURL Page
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: users[req.cookies['user_id']] }
+  const templateVars = { user_id: users[req.cookies['user_id']] }
   res.render("urls_new", templateVars);
 });
 
 //Renders Edit Page for each Short URL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { username: users[req.cookies['user_id']], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = { user_id: users[req.cookies['user_id']], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
