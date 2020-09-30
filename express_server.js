@@ -135,6 +135,7 @@ app.get("/login", (req, res) => {
 
 //ACTION ROUTES
 
+// ******************************************************************************************NEEDS UPDATING
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
@@ -148,7 +149,10 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = req.params.id;
-  urlDatabase[shortURL] = longURL;
+  if (!req.cookies['user_id']) {
+    return res.status(404).send("Authentication Required");
+  }
+  urlDatabase[shortURL].longURL = longURL;
   res.redirect(`/urls/`);
 });
 
@@ -202,6 +206,9 @@ app.post('/register', (req, res) => {
 
 //Delete- Removes URLs from database 
 app.post("/urls/:shortURL/delete", (req, res) => {
+  if (!req.cookies['user_id']) {
+    return res.status(404).send("Authentication Required");
+  }
   delete urlDatabase[req.params.shortURL];
   res.redirect(`/urls/`);
 });
