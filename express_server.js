@@ -129,7 +129,6 @@ app.post("/login", (req, res) => {
   if (emailLookup(email) !== false) {
     foundUser = emailLookup(email)
   }
-  console.log('foundUser :', foundUser);
   if (foundUser === null) {
     return res.status(404).send("No user with that email found")
   }
@@ -142,9 +141,9 @@ app.post("/login", (req, res) => {
   res.redirect('/urls/');
 });
 
-//Edit- Logout and Cookie clearing
+//Edit- Logout and Cookie Clearing
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls/');
 });
 
