@@ -78,7 +78,11 @@ app.get("/urls", (req, res) => {
 //Renders Create New TinyURL Page
 app.get("/urls/new", (req, res) => {
   const templateVars = { user_id: users[req.cookies['user_id']] }
-  res.render("urls_new", templateVars);
+  if (req.cookies['user_id']) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect('/login');
+  }
 });
 
 //Renders Edit Page for each Short URL
