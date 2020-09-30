@@ -135,7 +135,6 @@ app.get("/login", (req, res) => {
 
 //ACTION ROUTES
 
-// ******************************************************************************************NEEDS UPDATING
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
