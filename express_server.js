@@ -100,6 +100,10 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+//Renders Login Page
+app.get("/login", (req, res) => {
+  res.render("login");
+});
 
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
@@ -139,7 +143,7 @@ app.post('/register', (req, res) => {
   if (email === '' || password === '') {
     return res.status(404).send("Invalid email or password");
   }
-  console.log('emailLookup(email :', emailLookup(email));
+
   if (emailLookup(email)) {
     return res.status(404).send("User Email Already Exists");
   }
@@ -149,7 +153,7 @@ app.post('/register', (req, res) => {
     password
   };
   users[id] = newUser;
-  // console.log('users :', users);
+
   res.cookie('user_id', id);
   res.redirect('/urls/');
 });
