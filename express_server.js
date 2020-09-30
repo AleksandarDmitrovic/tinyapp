@@ -2,16 +2,17 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
+//---Server Setup---//
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
-//Middleware
+//---Middleware---//
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//My variables
+//---Databases & My Global Variables---//
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -52,7 +53,10 @@ const emailLookup = (email) => {
 
 };
 
-//Root Page
+//---Routes---//
+
+//VIEW ROUTES
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -97,13 +101,17 @@ app.get("/u/:shortURL", (req, res) => {
 
 //Renders Registration Form
 app.get("/register", (req, res) => {
-  res.render("register");
+  const templateVars = { user_id: users[req.cookies['user_id']] }
+  res.render("register", templateVars);
 });
 
 //Renders Login Page
 app.get("/login", (req, res) => {
-  res.render("login");
+  const templateVars = { user_id: users[req.cookies['user_id']] }
+  res.render("login", templateVars);
 });
+
+//ACTION ROUTES
 
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
@@ -181,6 +189,7 @@ app.get('*', (req, res) => {
   res.status(404).send('page not found');
 });
 
+//---Server Listener---//
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
