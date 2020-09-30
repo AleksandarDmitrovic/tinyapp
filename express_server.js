@@ -39,6 +39,19 @@ const users = {
   }
 }
 
+//Helper Function to Search users Database
+const emailLookup = (email) => {
+
+  for (const id in users) {
+    if (users[id].email === email) {
+      return true;
+    }
+  }
+
+  return false;
+
+};
+
 //Root Page
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -123,13 +136,20 @@ app.post('/register', (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  if (email === '' || password === '') {
+    return res.status(404).send("Invalid email or password");
+  }
+  console.log('emailLookup(email :', emailLookup(email));
+  if (emailLookup(email)) {
+    return res.status(404).send("User Email Already Exists");
+  }
   const newUser = {
     id,
     email,
     password
   };
   users[id] = newUser;
-  console.log('users :', users);
+  // console.log('users :', users);
   res.cookie('user_id', id);
   res.redirect('/urls/');
 });
