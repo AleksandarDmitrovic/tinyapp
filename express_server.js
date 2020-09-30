@@ -141,7 +141,8 @@ app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  const id = req.cookies['user_id']
+  urlDatabase[shortURL] = { longURL, userID: id };
   res.redirect(`/urls/${shortURL}`);
 });
 
