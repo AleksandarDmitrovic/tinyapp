@@ -96,7 +96,6 @@ app.get("/urls/:shortURL", (req, res) => {
     const visits = urlDatabase[shortURL].visits;
     const uniqueVisits = urlDatabase[shortURL].uniqueVisits;
     const visitList = urlDatabase[shortURL].visitList;
-    console.log('visitList :', visitList);
 
     const templateVars = { user_id: users[req.session['user_id']], longURL: longURLValue, shortURL, visits, uniqueVisits, visitList };
     res.render("urls_show", templateVars);
@@ -120,7 +119,7 @@ app.get("/u/:shortURL", (req, res, next) => {
     // console.log('timeZones :', timeZones);
 
     const date = new Date()
-    const format = 'D.M.YYYY HH:mm:ss.SSS [GMT]Z (z)'
+    const format = 'D.M.YYYY HH:mm:ss (z)'
     const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' })
     const datetime = output;
     const visitorID = generateRandomString(8);
@@ -134,8 +133,6 @@ app.get("/u/:shortURL", (req, res, next) => {
       req.session.uniqueVisitor = generateRandomString(6);
       shortURLObj['uniqueVisits'] = uniqueVisits + 1;
     }
-
-    console.log('urlDatabase :', urlDatabase);
 
     const longURL = shortURLObj['longURL'];
     res.redirect(longURL);
