@@ -143,7 +143,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(`/urls/`);
 });
 
-//Add- Creates Login Cookie with User ID
+//Add- Creates Login Cookie with User ID & Hashed Password
 app.post("/login", (req, res) => {
   const { email, password } = req.body; // Short hand for creating email password constants
   let foundUser = null;
