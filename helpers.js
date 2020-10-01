@@ -9,8 +9,30 @@ const getUserByEmail = (email, database) => {
     }
   }
 
-  return false;
+};
+
+//Returns URLs associated with a specific user ID
+const urlsForUser = (id, database) => {
+  let result = {};
+
+  for (const url in database) {
+    if (database[url].userID === id) {
+      result[url] = database[url];
+    }
+  }
+
+  return result;
 
 };
 
-module.exports = { getUserByEmail };
+//Generates Alphanumeric string of choosen length
+const generateRandomString = (charNum) => {
+  let result = '';
+  const charcters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < charNum; i++) {
+    result += charcters.charAt(Math.floor(Math.random() * charcters.length));
+  }
+  return result;
+};
+
+module.exports = { getUserByEmail, urlsForUser, generateRandomString };

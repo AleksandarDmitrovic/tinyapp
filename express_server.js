@@ -4,7 +4,8 @@ const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
 //--My Imporrts--//
-const { getUserByEmail } = require("./helpers");
+//Helper Functions
+const { getUserByEmail, urlsForUser, generateRandomString } = require("./helpers");
 
 //---Server Setup---//
 const app = express();
@@ -19,19 +20,10 @@ app.use(cookieSession({
   keys: ['super-long-secret-key-how-about-that']
 }));
 
-//---Databases & My Global Variables---//
+//---Databases My Global Variables---//
 let urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
-};
-
-const generateRandomString = () => {
-  let result = '';
-  const charcters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 6; i++) {
-    result += charcters.charAt(Math.floor(Math.random() * charcters.length));
-  }
-  return result;
 };
 
 const users = {
@@ -45,22 +37,6 @@ const users = {
     email: "user2@example.com",
     password: "$2b$10$cowaKSEEXvCh8Hq7M0piWuYMYi2Yz29bBY8NLlPGRwrg7x2s6b.J6" //dishwasher-funk
   }
-};
-
-//Helper Functions
-
-//Returns URLs associated with a specific user ID
-const urlsForUser = (id) => {
-  let result = {};
-
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      result[url] = urlDatabase[url];
-    }
-  }
-
-  return result;
-
 };
 
 //---Routes---//
@@ -82,7 +58,7 @@ app.get("/urls.json", (req, res) => {
 //Renders All My URLs Page
 app.get("/urls", (req, res) => {
   const id = req.session['user_id'];
-  const usersURLs = urlsForUser(id);
+  const usersURLs = urlsForUser(id, urlDatabase);
   const templateVars = { user_id: users[req.session['user_id']], urls: usersURLs };
   res.render("urls_index", templateVars);
 });
@@ -133,7 +109,7 @@ app.get("/login", (req, res) => {
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
-  const shortURL = generateRandomString();
+  const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   const id = req.session['user_id'];
   urlDatabase[shortURL] = { longURL, userID: id };
@@ -144,7 +120,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = req.params.id;
-  const usersURLs = urlsForUser(req.session['user_id']);
+  const usersURLs = urlsForUser(req.session['user_id'], urlDatabase);
   if (!(shortURL in usersURLs)) {
     return res.status(404).send("Authentication Required");
   }
@@ -156,7 +132,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body; // Short hand for creating email password constants
   let foundUser = null;
-  if (getUserByEmail(email, users) !== false) {
+  if (getUserByEmail(email, users) !== undefined) {
     foundUser = getUserByEmail(email, users);
   }
   if (foundUser === null) {
@@ -179,7 +155,7 @@ app.post("/logout", (req, res) => {
 
 //Add- Registration Handler for New User Creation
 app.post('/register', (req, res) => {
-  const id = generateRandomString();
+  const id = generateRandomString(6);
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -188,7 +164,7 @@ app.post('/register', (req, res) => {
     return res.status(404).send("Invalid email or password");
   }
 
-  if (getUserByEmail(email, users) !== false) {
+  if (getUserByEmail(email, users) !== undefined) {
     return res.status(404).send("User Email Already Exists");
   }
   const newUser = {
