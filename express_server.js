@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
-//--My Imporrts--//
+//--My Imports--//
 //Helper Functions
 const { getUserByEmail, urlsForUser, generateRandomString } = require("./helpers");
 
@@ -97,7 +97,6 @@ app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL]['longURL'];
     res.redirect(longURL);
   }
-  // console.log('longURL :', longURL);
 });
 
 //Renders Registration Form
