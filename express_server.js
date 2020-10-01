@@ -13,19 +13,20 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
+app.set('trust proxy', 1);
 
 //---Middleware---//
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
-  name: 'TinyApp',
-  keys: ['super-long-secret-key-how-about-that']
+  name: 'session',
+  keys: ['super-long-secret-keys', 'typically-not-embedded-in-code']
 }));
 app.use(methodOverride('_method'));
 
 //---Databases My Global Variables---//
 let urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", views: 0, uniqueVisits: 0 },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", views: 0, uniqueVisits: 0 },
 };
 
 const users = {
@@ -93,11 +94,24 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 //Redirects to Long URL Link
-app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res, next) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send("URL does not exist");
   } else {
-    const longURL = urlDatabase[req.params.shortURL]['longURL'];
+    const shortURLID = urlDatabase[req.params.shortURL];
+
+    const totalVisits = shortURLID['views'];
+    shortURLID['views'] = totalVisits + 1;
+
+    const uniqueVisits = shortURLID['uniqueVisits'];
+    if (!req.session.uniqueVisitor) {
+      req.session.uniqueVisitor = generateRandomString(6);
+      shortURLID['uniqueVisits'] = uniqueVisits + 1;
+    }
+
+    console.log('urlDatabase :', urlDatabase);
+
+    const longURL = shortURLID['longURL'];
     res.redirect(longURL);
   }
 });
@@ -128,11 +142,10 @@ app.get("/login", (req, res) => {
 
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
-  console.log(req.body); //log the POST request body to the console
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   const id = req.session['user_id'];
-  urlDatabase[shortURL] = { longURL, userID: id };
+  urlDatabase[shortURL] = { longURL, userID: id, views: 0, uniqueVisits: 0 };
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -161,7 +174,6 @@ app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  console.log('hashedPassword :', hashedPassword);
   if (email === '' || password === '') {
     return res.status(404).send("Invalid email or password");
   }
@@ -175,7 +187,6 @@ app.post('/register', (req, res) => {
     password: hashedPassword
   };
   users[id] = newUser;
-  console.log('users :', users);
 
   req.session.user_id = id;
   res.redirect('/urls/');
