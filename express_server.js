@@ -20,7 +20,7 @@ app.use(cookieSession({
   name: 'TinyApp',
   keys: ['super-long-secret-key-how-about-that']
 }));
-app.use(methodOverride('X-HTTP-Method-Override'));
+app.use(methodOverride('_method'));
 
 //---Databases My Global Variables---//
 let urlDatabase = {
@@ -43,8 +43,9 @@ const users = {
 
 //---Routes---//
 
-//VIEW ROUTES
+//READ ROUTES
 
+//Root redirects to /urls
 app.get("/", (req, res) => {
   res.redirect('/urls');
 });
@@ -123,6 +124,8 @@ app.get("/login", (req, res) => {
 
 //ACTION ROUTES
 
+//ADD ROUTES
+
 //Add- Generates Random Short URL and Adds Key:Value to URL Database
 app.post("/urls", (req, res) => {
   console.log(req.body); //log the POST request body to the console
@@ -131,18 +134,6 @@ app.post("/urls", (req, res) => {
   const id = req.session['user_id'];
   urlDatabase[shortURL] = { longURL, userID: id };
   res.redirect(`/urls/${shortURL}`);
-});
-
-//Edit- Transforms Long URLs of Corresponding Short URLs EJS: urls_show
-app.post("/urls/:id", (req, res) => {
-  const longURL = req.body.longURL;
-  const shortURL = req.params.id;
-  const usersURLs = urlsForUser(req.session['user_id'], urlDatabase);
-  if (!(shortURL in usersURLs)) {
-    return res.status(404).send("Authentication Required");
-  }
-  urlDatabase[shortURL].longURL = longURL;
-  res.redirect(`/urls/`);
 });
 
 //Add- Creates Login Cookie with User ID & Hashed Password
@@ -161,12 +152,6 @@ app.post("/login", (req, res) => {
 
   req.session.user_id = foundUser.id;
 
-  res.redirect('/urls/');
-});
-
-//Edit- Logout and Cookie Clearing
-app.post("/logout", (req, res) => {
-  req.session = null;
   res.redirect('/urls/');
 });
 
@@ -196,14 +181,38 @@ app.post('/register', (req, res) => {
   res.redirect('/urls/');
 });
 
+//EDIT ROUTES
+
+//Edit- Transforms Long URLs of Corresponding Short URLs EJS: urls_show
+app.put("/urls/:id", (req, res) => {
+  const longURL = req.body.longURL;
+  const shortURL = req.params.id;
+  const usersURLs = urlsForUser(req.session['user_id'], urlDatabase);
+  if (!(shortURL in usersURLs)) {
+    return res.status(404).send("Authentication Required");
+  }
+  urlDatabase[shortURL].longURL = longURL;
+  res.redirect(`/urls/`);
+});
+
+//DELETE ROUTES
+
+//Delete- Logout and Cookie Clearing
+app.delete("/logout", (req, res) => {
+  req.session = null;
+  res.redirect('/urls/');
+});
+
 //Delete- Removes URLs from database
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   if (!req.session['user_id']) {
     return res.status(404).send("Authentication Required");
   }
   delete urlDatabase[req.params.shortURL];
   res.redirect(`/urls/`);
 });
+
+//-------------------------------------------------------//
 
 //Catchall to send user to error page if url isn't valid
 app.get('*', (req, res) => {
