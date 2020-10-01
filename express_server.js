@@ -75,18 +75,26 @@ app.get("/urls/new", (req, res) => {
 
 //Renders Edit Page for each Short URL
 app.get("/urls/:shortURL", (req, res) => {
-  const longURLValue = urlDatabase[req.params.shortURL]['longURL'];
-  const templateVars = { user_id: users[req.session['user_id']], shortURL: req.params.shortURL, longURL: longURLValue };
-  res.render("urls_show", templateVars);
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send("URL does not exist");
+  }
+  const shortURL = req.params.shortURL;
+  const usersURLs = urlsForUser(req.session['user_id'], urlDatabase);
+  if (!(shortURL in usersURLs)) {
+    return res.status(404).send("Authentication Required");
+  } else {
+    const longURLValue = urlDatabase[req.params.shortURL]['longURL'];
+    const templateVars = { user_id: users[req.session['user_id']], shortURL: req.params.shortURL, longURL: longURLValue };
+    res.render("urls_show", templateVars);
+  }
 });
 
 //Redirects to Long URL Link
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]['longURL'];
-  if (!longURL) {
-    console.log('error');
-    res.redirect('/');
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send("URL does not exist");
   } else {
+    const longURL = urlDatabase[req.params.shortURL]['longURL'];
     res.redirect(longURL);
   }
   // console.log('longURL :', longURL);
@@ -94,14 +102,22 @@ app.get("/u/:shortURL", (req, res) => {
 
 //Renders Registration Form
 app.get("/register", (req, res) => {
-  const templateVars = { user_id: users[req.session['user_id']] };
-  res.render("register", templateVars);
+  if (req.session['user_id']) {
+    res.redirect(`/urls/`);
+  } else {
+    const templateVars = { user_id: users[req.session['user_id']] };
+    res.render("register", templateVars);
+  }
 });
 
 //Renders Login Page
 app.get("/login", (req, res) => {
-  const templateVars = { user_id: users[req.session['user_id']] };
-  res.render("login", templateVars);
+  if (req.session['user_id']) {
+    res.redirect(`/urls/`);
+  } else {
+    const templateVars = { user_id: users[req.session['user_id']] };
+    res.render("login", templateVars);
+  }
 });
 
 //ACTION ROUTES
