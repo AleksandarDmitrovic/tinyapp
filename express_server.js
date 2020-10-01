@@ -51,16 +51,16 @@ const users = {
 
 //Root redirects to /urls
 app.get("/", (req, res) => {
-  res.redirect('/urls');
+  if (req.session['user_id']) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body><html>\n");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
 
 //Renders All My URLs Page
 app.get("/urls", (req, res) => {
@@ -114,10 +114,10 @@ app.get("/u/:shortURL", (req, res, next) => {
     const totalVisits = shortURLObj['visits'];
     shortURLObj['visits'] = totalVisits + 1;
 
-    //Date and Time stamp list with a unique visitor ID
     // const timeZones = listTimeZones()
     // console.log('timeZones :', timeZones);
 
+    //Date and Time stamp + Unique visitor ID
     const date = new Date()
     const format = 'D.M.YYYY HH:mm:ss (z)'
     const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' })
@@ -180,10 +180,10 @@ app.post("/login", (req, res) => {
     foundUser = getUserByEmail(email, users);
   }
   if (foundUser === null) {
-    return res.status(404).send("No user with that email found");
+    return res.status(404).send("Incorrect Email or Password");
   }
   if (!bcrypt.compareSync(password, foundUser.password)) {
-    return res.status(404).send(`Incorrect Password For ${email}`);
+    return res.status(404).send("Incorrect Email or Password");
   }
 
   req.session.user_id = foundUser.id;

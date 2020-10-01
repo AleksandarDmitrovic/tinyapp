@@ -21,7 +21,6 @@
   "dependencies": {
     "bcrypt": "2.0.0",
     "body-parser": "^1.19.0",
-    "cookie-parser": "^1.4.5",
     "cookie-session": "^1.4.0",
     "date-fns": "^2.16.1",
     "date-fns-timezone": "^0.1.4",
