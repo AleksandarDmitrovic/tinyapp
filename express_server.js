@@ -1,4 +1,5 @@
 const express = require("express");
+const methodOverride = require("method-override");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
@@ -19,6 +20,7 @@ app.use(cookieSession({
   name: 'TinyApp',
   keys: ['super-long-secret-key-how-about-that']
 }));
+app.use(methodOverride('X-HTTP-Method-Override'));
 
 //---Databases My Global Variables---//
 let urlDatabase = {
