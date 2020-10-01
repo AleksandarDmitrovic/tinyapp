@@ -1,7 +1,7 @@
 //Helper Functions
 
 //Searchs users Database Returns User Object if Email Found
-const emailLookup = (email, database) => {
+const getUserByEmail = (email, database) => {
 
   for (const id in database) {
     if (database[id].email === email) {
@@ -13,4 +13,4 @@ const emailLookup = (email, database) => {
 
 };
 
-module.exports = { emailLookup };
+module.exports = { getUserByEmail };
