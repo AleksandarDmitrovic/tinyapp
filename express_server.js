@@ -3,6 +3,9 @@ const methodOverride = require("method-override");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
+const datefns = require("date-fns");
+const { parseFromTimeZone, formatToTimeZone } = require('date-fns-timezone')
+const { listTimeZones } = require('timezone-support')
 
 //--My Imports--//
 //Helper Functions
@@ -25,8 +28,8 @@ app.use(methodOverride('_method'));
 
 //---Databases My Global Variables---//
 let urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", views: 0, uniqueVisits: 0 },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", views: 0, uniqueVisits: 0 },
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", visits: 0, uniqueVisits: 0, visitList: [] },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", visits: 0, uniqueVisits: 0, visitList: [] },
 };
 
 const users = {
@@ -84,11 +87,18 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   const shortURL = req.params.shortURL;
   const usersURLs = urlsForUser(req.session['user_id'], urlDatabase);
+
   if (!(shortURL in usersURLs)) {
     return res.status(404).send("Authentication Required");
   } else {
-    const longURLValue = urlDatabase[req.params.shortURL]['longURL'];
-    const templateVars = { user_id: users[req.session['user_id']], shortURL: req.params.shortURL, longURL: longURLValue };
+
+    const longURLValue = urlDatabase[shortURL].longURL;
+    const visits = urlDatabase[shortURL].visits;
+    const uniqueVisits = urlDatabase[shortURL].uniqueVisits;
+    const visitList = urlDatabase[shortURL].visitList;
+    console.log('visitList :', visitList);
+
+    const templateVars = { user_id: users[req.session['user_id']], longURL: longURLValue, shortURL, visits, uniqueVisits, visitList };
     res.render("urls_show", templateVars);
   }
 });
@@ -98,20 +108,36 @@ app.get("/u/:shortURL", (req, res, next) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send("URL does not exist");
   } else {
-    const shortURLID = urlDatabase[req.params.shortURL];
 
-    const totalVisits = shortURLID['views'];
-    shortURLID['views'] = totalVisits + 1;
+    const shortURLObj = urlDatabase[req.params.shortURL];
 
-    const uniqueVisits = shortURLID['uniqueVisits'];
+    //Track Total Visits to each Short URL
+    const totalVisits = shortURLObj['visits'];
+    shortURLObj['visits'] = totalVisits + 1;
+
+    //Date and Time stamp list with a unique visitor ID
+    // const timeZones = listTimeZones()
+    // console.log('timeZones :', timeZones);
+
+    const date = new Date()
+    const format = 'D.M.YYYY HH:mm:ss.SSS [GMT]Z (z)'
+    const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' })
+    const datetime = output;
+    const visitorID = generateRandomString(8);
+
+    // shortURLObj.visitList += { [visitorID]: datetime };
+    shortURLObj.visitList.push({ visitorID, datetime });
+
+    //Track Total Unique Visits to Short URL
+    const uniqueVisits = shortURLObj['uniqueVisits'];
     if (!req.session.uniqueVisitor) {
       req.session.uniqueVisitor = generateRandomString(6);
-      shortURLID['uniqueVisits'] = uniqueVisits + 1;
+      shortURLObj['uniqueVisits'] = uniqueVisits + 1;
     }
 
     console.log('urlDatabase :', urlDatabase);
 
-    const longURL = shortURLID['longURL'];
+    const longURL = shortURLObj['longURL'];
     res.redirect(longURL);
   }
 });
@@ -145,7 +171,7 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   const id = req.session['user_id'];
-  urlDatabase[shortURL] = { longURL, userID: id, views: 0, uniqueVisits: 0 };
+  urlDatabase[shortURL] = { longURL, userID: id, visits: 0, uniqueVisits: 0, visitList: [] };
   res.redirect(`/urls/${shortURL}`);
 });
 

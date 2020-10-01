@@ -16,6 +16,8 @@
     <div class="card-body">
       <h5 class="card-title">TinyURL for: <%= longURL %></h5>
       <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+      <p class="card-text">Total Visits: <%= visits %></p>
+      <p class="card-text">Total Unique Visits: <%= uniqueVisits %></p>
     </div>
     <div class="card-footer text-muted">
       <div class="card-body">
@@ -28,6 +30,19 @@
         </form>
       </div>
     </div>
+    <div>
+      <div class="card-header"></div>
+      <div class="card-body"></div>
+      <h5 class="card-title">Visitors List</h5>
+      <% for (const item of visitList) { %>
+      <p><%= item['visitorID']  %></p>
+      <p><%= item['datetime']  %></p>
+
+      <% }%>
+
+
+    </div>
+
 
     <!--Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
