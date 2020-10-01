@@ -3,6 +3,9 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
+//--My Imporrts--//
+const { emailLookup } = require("./helpers");
+
 //---Server Setup---//
 const app = express();
 const PORT = 8080; // default port 8080
@@ -45,18 +48,6 @@ const users = {
 };
 
 //Helper Functions
-//Searchs users Database Returns User Object if Email Found
-const emailLookup = (email, database) => {
-
-  for (const id in database) {
-    if (database[id].email === email) {
-      return database[id];
-    }
-  }
-
-  return false;
-
-};
 
 //Returns URLs associated with a specific user ID
 const urlsForUser = (id) => {
