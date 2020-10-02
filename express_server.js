@@ -101,8 +101,9 @@ app.get("/urls/:shortURL", (req, res) => {
     const visits = urlDatabase[shortURL].visits;
     const uniqueVisits = urlDatabase[shortURL].uniqueVisits;
     const visitList = urlDatabase[shortURL].visitList;
+    const dateCreated = urlDatabase[shortURL].dateCreated;
 
-    const templateVars = { user_id: users[req.session['user_id']], longURL: longURLValue, shortURL, visits, uniqueVisits, visitList };
+    const templateVars = { user_id: users[req.session['user_id']], longURL: longURLValue, shortURL, visits, uniqueVisits, visitList, dateCreated };
     res.render("urls_show", templateVars);
   }
 });
