@@ -134,10 +134,27 @@ app.get("/u/:shortURL", (req, res, next) => {
     shortURLObj.visitList.push({ visitorID, datetime });
 
     //Track Total Unique Visits to Short URL
-    const uniqueVisits = shortURLObj['uniqueVisits'];
+
+    //Track visits by logged in users or public users
+    const id = req.session.user_id || 'public';
+
     if (!req.session.uniqueVisitor) {
-      req.session.uniqueVisitor = generateRandomString(6);
+      req.session.uniqueVisitor = {};
+    }
+
+    if (!Array.isArray(req.session.uniqueVisitor[id])) {
+      req.session.uniqueVisitor[id] = []
+    }
+    //Variable to track visits
+    const uniqueVisits = shortURLObj['uniqueVisits'];
+
+    if (!req.session.uniqueVisitor[id].includes(req.params.shortURL)) {
+
+      //Push the short urlID into the uniqueVisitor cookie at  { id: [urlID] } 
+      req.session.uniqueVisitor[id].push(req.params.shortURL);
+      //Increment the unique visits for the specific short URL
       shortURLObj['uniqueVisits'] = uniqueVisits + 1;
+
     }
 
     const longURL = shortURLObj['longURL'];
@@ -245,7 +262,7 @@ app.put("/urls/:id", (req, res) => {
 
 //Delete- Logout and Cookie Clearing
 app.delete("/logout", (req, res) => {
-  req.session = null;
+  req.session.user_id = null;
   res.redirect('/urls/');
 });
 
