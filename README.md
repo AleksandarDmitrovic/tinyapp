@@ -8,8 +8,9 @@ I added method-override middleware to make PUT and DELETE requests in the server
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["Screenshot of URLs page"](https://github.com/AleksandarDmitrovic/tinyapp/blob/master/docs/urls-page.png?raw=true)
+!["Screenshot of Shortened URL Edit page"](https://github.com/AleksandarDmitrovic/tinyapp/blob/master/docs/urls_:id-page.png?raw=true)
+!["Screenshot of Create New URL page"](https://github.com/AleksandarDmitrovic/tinyapp/blob/master/docs/urls_new-page.png?raw=true)
 
 ## Dependencies
 
