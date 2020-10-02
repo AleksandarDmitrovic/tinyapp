@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 const datefns = require("date-fns");
-const { parseFromTimeZone, formatToTimeZone } = require('date-fns-timezone')
-const { listTimeZones } = require('timezone-support')
+const { parseFromTimeZone, formatToTimeZone } = require('date-fns-timezone');
+const { listTimeZones } = require('timezone-support');
 
 //--My Imports--//
 //Helper Functions
@@ -124,9 +124,9 @@ app.get("/u/:shortURL", (req, res, next) => {
     // console.log('timeZones :', timeZones);
 
     //Date and Time stamp + Unique visitor ID
-    const date = new Date()
-    const format = 'D.M.YYYY HH:mm:ss (z)'
-    const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' })
+    const date = new Date();
+    const format = 'D.M.YYYY HH:mm:ss (z)';
+    const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' });
     const datetime = output;
     const visitorID = generateRandomString(8);
 
@@ -143,14 +143,14 @@ app.get("/u/:shortURL", (req, res, next) => {
     }
 
     if (!Array.isArray(req.session.uniqueVisitor[id])) {
-      req.session.uniqueVisitor[id] = []
+      req.session.uniqueVisitor[id] = [];
     }
     //Variable to track visits
     const uniqueVisits = shortURLObj['uniqueVisits'];
 
     if (!req.session.uniqueVisitor[id].includes(req.params.shortURL)) {
 
-      //Push the short urlID into the uniqueVisitor cookie at  { id: [urlID] } 
+      //Push the short urlID into the uniqueVisitor cookie at  { id: [urlID] }
       req.session.uniqueVisitor[id].push(req.params.shortURL);
       //Increment the unique visits for the specific short URL
       shortURLObj['uniqueVisits'] = uniqueVisits + 1;
@@ -192,9 +192,9 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   const id = req.session['user_id'];
   //Date Created
-  const date = new Date()
-  const format = 'D.M.YYYY HH:mm:ss (z)'
-  const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' })
+  const date = new Date();
+  const format = 'D.M.YYYY HH:mm:ss (z)';
+  const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' });
   const datetime = output;
 
   urlDatabase[shortURL] = { longURL, userID: id, visits: 0, uniqueVisits: 0, visitList: [], dateCreated: datetime };
@@ -223,8 +223,7 @@ app.post("/login", (req, res) => {
 //Add- Registration Handler for New User Creation
 app.post('/register', (req, res) => {
   const id = generateRandomString(6);
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (email === '' || password === '') {
     return res.status(404).send("Invalid email or password");
