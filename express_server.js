@@ -66,6 +66,11 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const id = req.session['user_id'];
   const usersURLs = urlsForUser(id, urlDatabase);
+
+  // const visits = urlDatabase[shortURL].visits;
+
+  // const uniqueVisits = urlDatabase[shortURL].uniqueVisits;
+
   const templateVars = { user_id: users[req.session['user_id']], urls: usersURLs };
   res.render("urls_index", templateVars);
 });
