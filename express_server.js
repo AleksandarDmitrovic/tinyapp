@@ -28,8 +28,8 @@ app.use(methodOverride('_method'));
 
 //---Databases My Global Variables---//
 let urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", visits: 0, uniqueVisits: 0, visitList: [] },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", visits: 0, uniqueVisits: 0, visitList: [] },
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", visits: 0, uniqueVisits: 0, visitList: [], dateCreated: 'Once Upon A Time' },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", visits: 0, uniqueVisits: 0, visitList: [], dateCreated: 'A Long Long Time Ago' },
 };
 
 const users = {
@@ -173,7 +173,13 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   const id = req.session['user_id'];
-  urlDatabase[shortURL] = { longURL, userID: id, visits: 0, uniqueVisits: 0, visitList: [] };
+  //Date Created
+  const date = new Date()
+  const format = 'D.M.YYYY HH:mm:ss (z)'
+  const output = formatToTimeZone(date, format, { timeZone: 'America/Edmonton' })
+  const datetime = output;
+
+  urlDatabase[shortURL] = { longURL, userID: id, visits: 0, uniqueVisits: 0, visitList: [], dateCreated: datetime };
   res.redirect(`/urls/${shortURL}`);
 });
 
